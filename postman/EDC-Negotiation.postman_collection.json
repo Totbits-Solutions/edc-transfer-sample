@@ -1,0 +1,237 @@
+{
+  "info": {
+    "name": "EDC Transfer 01 - Negotiation Workflow",
+    "description": "Postman collection for EDC negotiation workflow between two connectors",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Provider Setup",
+      "item": [
+        {
+          "name": "1. Create Asset on Provider",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"@id\": \"assetId\",\n  \"properties\": {\n    \"name\": \"product description\",\n    \"contenttype\": \"application/json\"\n  },\n  \"dataAddress\": {\n    \"type\": \"HttpData\",\n    \"name\": \"Test asset\",\n    \"baseUrl\": \"https://jsonplaceholder.typicode.com/users\",\n    \"proxyPath\": \"true\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:19193/management/v3/assets",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "19193",
+              "path": [
+                "management",
+                "v3",
+                "assets"
+              ]
+            },
+            "description": "Creates an asset on the provider connector. The asset contains the data to be shared."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Create Policy on Provider",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n    \"odrl\": \"http://www.w3.org/ns/odrl/2/\"\n  },\n  \"@id\": \"aPolicy\",\n  \"policy\": {\n    \"@context\": \"http://www.w3.org/ns/odrl.jsonld\",\n    \"@type\": \"Set\",\n    \"permission\": [],\n    \"prohibition\": [],\n    \"obligation\": []\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:19193/management/v3/policydefinitions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "19193",
+              "path": [
+                "management",
+                "v3",
+                "policydefinitions"
+              ]
+            },
+            "description": "Creates an access policy on the provider. This policy gives direct access to assets associated with contract definitions."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Create Contract Definition on Provider",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"@id\": \"1\",\n  \"accessPolicyId\": \"aPolicy\",\n  \"contractPolicyId\": \"aPolicy\",\n  \"assetsSelector\": []\n}"
+            },
+            "url": {
+              "raw": "http://localhost:19193/management/v3/contractdefinitions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "19193",
+              "path": [
+                "management",
+                "v3",
+                "contractdefinitions"
+              ]
+            },
+            "description": "Creates a contract definition on the provider. Associates policies to assets to generate contract offers for the catalog."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Consumer Operations",
+      "item": [
+        {
+          "name": "4. Fetch Catalog from Provider",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"counterPartyAddress\": \"http://localhost:19194/protocol\",\n  \"protocol\": \"dataspace-protocol-http\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:29193/management/v3/catalog/request",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "29193",
+              "path": [
+                "management",
+                "v3",
+                "catalog",
+                "request"
+              ]
+            },
+            "description": "Fetches the catalog from the provider. Contains all contract offers available for negotiation."
+          },
+          "response": []
+        },
+        {
+          "name": "5. Negotiate Contract",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"@type\": \"ContractRequest\",\n  \"counterPartyAddress\": \"http://localhost:19194/protocol\",\n  \"protocol\": \"dataspace-protocol-http\",\n  \"policy\": {\n    \"@context\": \"http://www.w3.org/ns/odrl.jsonld\",\n    \"@id\": \"MQ==:YXNzZXRJZA==:OGY2OGM1Y2UtYzkzOS00Y2E3LTliYmYtYmZkMjk0Y2NlMzcy\",\n    \"@type\": \"Offer\",\n    \"assigner\": \"provider\",\n    \"target\": \"assetId\"\n  }\n}\n\n"
+            },
+            "url": {
+              "raw": "http://localhost:29193/management/v3/contractnegotiations",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "29193",
+              "path": [
+                "management",
+                "v3",
+                "contractnegotiations"
+              ]
+            },
+            "description": "Initiates a contract negotiation sequence with the provider. Returns a negotiation ID that can be used to check status."
+          },
+          "response": []
+        },
+        {
+          "name": "6. Get Contract Negotiation Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:29193/management/v3/contractnegotiations/{{contract-negotiation-id}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "29193",
+              "path": [
+                "management",
+                "v3",
+                "contractnegotiations",
+                "{{contract-negotiation-id}}"
+              ]
+            },
+            "description": "Checks the current status of an ongoing contract negotiation. Returns the contractAgreementId when status is FINALIZED."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "contract-negotiation-id",
+      "value": "",
+      "type": "string",
+      "description": "The ID of the contract negotiation (obtained from the Negotiate Contract response)"
+    },
+    {
+      "key": "contract-offer-id",
+      "value": "",
+      "type": "string",
+      "description": "The contract offer ID from the catalog (dcat:dataset.odrl:hasPolicy.@id)"
+    },
+    {
+      "key": "provider-host",
+      "value": "localhost",
+      "type": "string"
+    },
+    {
+      "key": "provider-port",
+      "value": "19193",
+      "type": "string"
+    },
+    {
+      "key": "consumer-host",
+      "value": "localhost",
+      "type": "string"
+    },
+    {
+      "key": "consumer-port",
+      "value": "29193",
+      "type": "string"
+    }
+  ]
+}
