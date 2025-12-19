@@ -18,6 +18,15 @@ services:
       timeout: 5s
       retries: 10
 
+  http-request-logger:
+    build:
+      context: util/http-request-logger
+      dockerfile: Dockerfile
+    container_name: http-request-logger
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+
 volumes:
   postgres-data:
   vault-file:
