@@ -253,7 +253,148 @@
 					"response": []
 				}
 			]
-		}
+		},
+        {
+          "name": "03_Transfer",
+          "item": [
+            {
+              "name": "4. Fetch Catalog from Provider",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"counterPartyAddress\": \"http://localhost:19194/protocol\",\n  \"protocol\": \"dataspace-protocol-http\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:29193/management/v3/catalog/request",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "29193",
+                  "path": ["management", "v3", "catalog", "request"]
+                },
+                "description": "Fetches the catalog from the provider. Contains all contract offers available for negotiation."
+              },
+              "response": []
+            },
+            {
+              "name": "5. Negotiate Contract",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"@type\": \"ContractRequest\",\n  \"counterPartyAddress\": \"http://localhost:19194/protocol\",\n  \"protocol\": \"dataspace-protocol-http\",\n  \"policy\": {\n    \"@context\": \"http://www.w3.org/ns/odrl.jsonld\",\n    \"@id\": \"MQ==:YXNzZXRJZA==:ZTczOTMyOGMtYWQ2OS00NjgzLWI2M2QtZDBhZTk4NWFiMDY5\",\n    \"@type\": \"Offer\",\n    \"assigner\": \"provider\",\n    \"target\": \"assetId\"\n  }\n}\n\n"
+                },
+                "url": {
+                  "raw": "http://localhost:29193/management/v3/contractnegotiations",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "29193",
+                  "path": ["management", "v3", "contractnegotiations"]
+                },
+                "description": "Initiates a contract negotiation sequence with the provider. Returns a negotiation ID that can be used to check status."
+              },
+              "response": []
+            },
+            {
+              "name": "6. Start transfer pull",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"@type\": \"TransferRequestDto\",\n  \"connectorId\": \"provider\",\n  \"counterPartyAddress\": \"http://localhost:19194/protocol\",\n  \"contractId\": \"{{contract-agreement-id}}\",\n  \"protocol\": \"dataspace-protocol-http\",\n  \"transferType\": \"HttpData-PULL\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:29193/management/v3/transferprocesses",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "29193",
+                  "path": ["management", "v3", "transferprocesses"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "7. Check status",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:29193/management/v3/transferprocesses/{{transfer_process_id}}",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "29193",
+                  "path": [
+                    "management",
+                    "v3",
+                    "transferprocesses",
+                    "{{transfer_process_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "8. Get Endpoint Data Reference",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:29193/management/v3/edrs/{{transfer_process_id}}/dataaddress",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "29193",
+                  "path": [
+                    "management",
+                    "v3",
+                    "edrs",
+                    "{{transfer_process_id}}",
+                    "dataaddress"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "9. Get Data",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{authorization}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{endpoint}}",
+                  "host": ["{{endpoint}}"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
 	],
 	"variable": [
 		{
@@ -287,6 +428,24 @@
 			"key": "consumer-port",
 			"value": "29193",
 			"type": "string"
-		}
+		},
+      {
+        "key": "transfer_process_id",
+        "value": "",
+        "type": "string",
+        "description": "The ID of the transfer process (obtained from the Start transfer process response)"
+      },
+      {
+        "key": "endpoint",
+        "value": "",
+        "type": "string",
+        "description": "The endpoint URL obtained from the EDR"
+      },
+      {
+        "key": "authorization",
+        "value": "",
+        "type": "string",
+        "description": "The authorization token obtained from the EDR"
+      }
 	]
 }
