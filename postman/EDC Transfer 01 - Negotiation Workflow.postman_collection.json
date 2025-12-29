@@ -394,7 +394,133 @@
               "response": []
             }
           ]
-        }
+        },
+      {
+        "name": "04_transfer_event",
+        "item": [
+          {
+            "name": "4. Fetch Catalog from Provider",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"counterPartyAddress\": \"http://localhost:19194/protocol\",\n  \"protocol\": \"dataspace-protocol-http\"\n}"
+              },
+              "url": {
+                "raw": "http://localhost:29193/management/v3/catalog/request",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "29193",
+                "path": [
+                  "management",
+                  "v3",
+                  "catalog",
+                  "request"
+                ]
+              },
+              "description": "Fetches the catalog from the provider. Contains all contract offers available for negotiation."
+            },
+            "response": []
+          },
+          {
+            "name": "5. Negotiate Contract",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"@type\": \"ContractRequest\",\n  \"counterPartyAddress\": \"http://localhost:19194/protocol\",\n  \"protocol\": \"dataspace-protocol-http\",\n  \"policy\": {\n    \"@context\": \"http://www.w3.org/ns/odrl.jsonld\",\n    \"@id\": \"MQ==:YXNzZXRJZA==:ZTczOTMyOGMtYWQ2OS00NjgzLWI2M2QtZDBhZTk4NWFiMDY5\",\n    \"@type\": \"Offer\",\n    \"assigner\": \"provider\",\n    \"target\": \"assetId\"\n  }\n}\n\n"
+              },
+              "url": {
+                "raw": "http://localhost:29193/management/v3/contractnegotiations",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "29193",
+                "path": [
+                  "management",
+                  "v3",
+                  "contractnegotiations"
+                ]
+              },
+              "description": "Initiates a contract negotiation sequence with the provider. Returns a negotiation ID that can be used to check status."
+            },
+            "response": []
+          },
+          {
+            "name": "6. Get Contract Negotiation Status",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "http://localhost:29193/management/v3/contractnegotiations/{{contract-negotiation-id}}",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "29193",
+                "path": [
+                  "management",
+                  "v3",
+                  "contractnegotiations",
+                  "{{contract-negotiation-id}}"
+                ]
+              },
+              "description": "Checks the current status of an ongoing contract negotiation. Returns the contractAgreementId when status is FINALIZED."
+            },
+            "response": []
+          },
+          {
+            "name": "7. Start transfer process",
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"@type\": \"TransferRequestDto\",\n  \"connectorId\": \"provider\",\n  \"counterPartyAddress\": \"http://localhost:19194/protocol\",\n  \"contractId\": \"{{contract-id}}\",\n  \"protocol\": \"dataspace-protocol-http\",\n  \"transferType\": \"HttpData-PUSH\",\n  \"dataDestination\": {\n    \"type\": \"HttpData\",\n    \"baseUrl\": \"http://localhost:4000/api/consumer/store\"\n  }\n}\n",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "http://localhost:29193/management/v3/transferprocesses",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "29193",
+                "path": [
+                  "management",
+                  "v3",
+                  "transferprocesses"
+                ]
+              }
+            },
+            "response": []
+          }
+        ]
+      }
 	],
 	"variable": [
 		{
