@@ -67,7 +67,14 @@ Run this to build and launch the consumer with listener extension:
 java -Dedc.fs.config=transfer-00-prerequisites/resources/configuration/consumer-configuration.properties -jar transfer-04-event-consumer/consumer-with-listener/build/libs/connector.jar
 ````
 
-### 2. Negotiate a new contract
+### 2. Build & launch the provider with listener
+
+```bash
+./gradlew transfer-04-event-consumer:provider-with-listener:build
+java -Dedc.fs.config=transfer-00-prerequisites/resources/configuration/provider-configuration.properties -jar transfer-04-event-consumer/provider-with-listener/build/libs/connector.jar
+```
+
+### 3. Negotiate a new contract
 
 ```bash
 curl -d @transfer-01-negotiation/resources/negotiate-contract.json \
@@ -75,7 +82,7 @@ curl -d @transfer-01-negotiation/resources/negotiate-contract.json \
   -s | jq
 ```
 
-### 3. Get the contract agreement id
+### 4. Get the contract agreement id
 
 ```bash
 curl -X GET "http://localhost:29193/management/v3/contractnegotiations/{{contract-negotiation-id}}" \
@@ -83,7 +90,7 @@ curl -X GET "http://localhost:29193/management/v3/contractnegotiations/{{contrac
     -s | jq
 ```
 
-### 4. Perform a file transfer
+### 5. Perform a file transfer
 
 #### Start a http server
 
@@ -106,7 +113,7 @@ curl -X POST "http://localhost:29193/management/v3/transferprocesses" \
   -s | jq
 ```
 
-### 5. Inspect the logs
+### 6. Inspect the logs
 
 The consumer should spew out logs similar to:
 
