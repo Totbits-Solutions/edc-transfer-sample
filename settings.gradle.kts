@@ -17,6 +17,7 @@ dependencyResolutionManagement {
 include(":transfer-00-prerequisites:connector")
 
 include(":transfer-04-event-consumer:consumer-with-listener")
+include(":transfer-04-event-consumer:provider-with-listener")
 include(":transfer-04-event-consumer:listener")
 
 include(":transfer-05-file-transfer-cloud:cloud-transfer-consumer")

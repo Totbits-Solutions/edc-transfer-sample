@@ -33,17 +33,29 @@ class KafkaToKafkaDataFlowController implements DataFlowController {
 
     @Override
     public boolean canHandle(TransferProcess transferProcess) {
-        return KAFKA_TYPE.equals(transferProcess.getContentDataAddress().getType()) && "KafkaBroker-PULL".equals(transferProcess.getTransferType());
+        System.out.println("canHandle: " + transferProcess.toString());
+        var contentDataAddress = transferProcess.getContentDataAddress();
+        var isCorrectTransferType = "KafkaBroker-PULL".equals(transferProcess.getTransferType());
+
+        // If contentDataAddress is available (provider side), check both type and transferType
+        // If not available (consumer side), only check transferType
+        if (contentDataAddress != null) {
+            return KAFKA_TYPE.equals(contentDataAddress.getType()) && isCorrectTransferType;
+        }
+
+        return isCorrectTransferType;
     }
 
     @Override
     public StatusResult<DataFlowResponse> provision(TransferProcess transferProcess, Policy policy) {
+        System.out.println("provision: " + transferProcess.toString());
         // here the flow can be provisioned, not something covered in this sample
-        return StatusResult.success(null);
+        return StatusResult.success(DataFlowResponse.Builder.newInstance().build());
     }
 
     @Override
     public @NotNull StatusResult<DataFlowResponse> start(TransferProcess transferProcess, Policy policy) {
+        System.out.println("start: " + transferProcess.toString());
         // static credentials, in a production case these should be created dynamically and an ACLs entry should be added
         var username = "alice";
         var password = "alice-secret";
@@ -64,19 +76,22 @@ class KafkaToKafkaDataFlowController implements DataFlowController {
 
     @Override
     public StatusResult<Void> suspend(TransferProcess transferProcess) {
+        System.out.println("suspend: " + transferProcess.toString());
         // here the flow can be suspended, not something covered in this sample
         return StatusResult.success();
     }
 
     @Override
     public StatusResult<Void> terminate(TransferProcess transferProcess) {
+        System.out.println("terminate: " + transferProcess.toString());
         // here the flow can be terminated, not something covered in this sample
         return StatusResult.success();
     }
 
     @Override
     public Set<String> transferTypesFor(Asset asset) {
-        return Set.of("Kafka-PULL");
+        System.out.println("transferTypesFor: " + asset.toString());
+        return Set.of("KafkaBroker-PULL");
     }
 
 }

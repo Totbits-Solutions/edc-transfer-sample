@@ -2,7 +2,7 @@ services:
   # Postgres mirror of deployment/modules/postgres
   postgres:
     image: postgres:16.3-alpine3.20
-    container_name: mvd-postgres
+    container_name: mvd-postgres-transfer
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
@@ -22,10 +22,40 @@ services:
     build:
       context: util/http-request-logger
       dockerfile: Dockerfile
-    container_name: http-request-logger
+    container_name: http-request-logger-transfer
     restart: unless-stopped
     ports:
       - "4000:4000"
+
+  kafka-kraft:
+    image: confluentinc/cp-kafka:7.5.2
+    container_name: kafka-kraft
+    hostname: kafka-kraft
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./transfer-06-kafka-broker/kafka-config:/config
+    env_file:
+      - ./transfer-06-kafka-broker/kafka.env
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093,BROKER://0.0.0.0:9092,CONTROLLER://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9093,BROKER://localhost:9092
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: 1
+      CLUSTER_ID: 4L6g3nShT-eMCtK--X86sw
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 --command-config /config/admin.properties || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
 volumes:
   postgres-data:

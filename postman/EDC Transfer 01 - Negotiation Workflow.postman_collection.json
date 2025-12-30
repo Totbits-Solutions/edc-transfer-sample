@@ -520,6 +520,237 @@
             "response": []
           }
         ]
+      },
+      {
+        "name": "06_transfer_kafka",
+        "item": [
+          {
+            "name": "1. assets - provider",
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"@context\": { \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\" },\n  \"@id\": \"kafka-stream-asset\",\n  \"properties\": {\n  },\n  \"dataAddress\": {\n    \"type\": \"Kafka\",\n    \"kafka.bootstrap.servers\": \"{{bootstrap.servers}}\",\n    \"topic\": \"{{topic}}\"\n  }\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "http://localhost:18181/management/v3/assets",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "18181",
+                "path": [
+                  "management",
+                  "v3",
+                  "assets"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "2. policy - provider",
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\",\n    \"odrl\": \"http://www.w3.org/ns/odrl/2/\"\n  },\n  \"@id\": \"no-constraint-policy\",\n  \"policy\": {\n    \"@type\": \"odrl:Set\"\n  }\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "http://localhost:18181/management/v3/policydefinitions",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "18181",
+                "path": [
+                  "management",
+                  "v3",
+                  "policydefinitions"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "3. contract definition - provider",
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"@context\": { \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\" },\n  \"@id\": \"contract-definition\",\n  \"accessPolicyId\": \"no-constraint-policy\",\n  \"contractPolicyId\": \"no-constraint-policy\",\n  \"assetsSelector\": []\n}\n",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "http://localhost:18181/management/v3/contractdefinitions",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "18181",
+                "path": [
+                  "management",
+                  "v3",
+                  "contractdefinitions"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "4. catalog - consumer",
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"@context\": { \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\" },\n  \"@type\": \"DatasetRequest\",\n  \"@id\": \"kafka-stream-asset\",\n  \"counterPartyAddress\": \"http://localhost:18182/protocol\",\n  \"protocol\": \"dataspace-protocol-http\"\n}\n",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "http://localhost:28181/management/v3/catalog/dataset/request",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "28181",
+                "path": [
+                  "management",
+                  "v3",
+                  "catalog",
+                  "dataset",
+                  "request"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "5. Negotation",
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"@context\": {\n    \"edc\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"@type\": \"ContractRequest\",\n  \"counterPartyAddress\": \"http://localhost:18182/protocol\",\n  \"protocol\": \"dataspace-protocol-http\",\n  \"policy\": {\n    \"@context\": \"http://www.w3.org/ns/odrl.jsonld\",\n    \"@id\": \"{{offerId}}\",\n    \"@type\": \"Offer\",\n    \"permission\": [],\n    \"prohibition\": [],\n    \"obligation\": [],\n    \"assigner\": \"provider\",\n    \"target\": \"kafka-stream-asset\"\n  }\n}\n",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "http://localhost:28181/management/v3/contractnegotiations",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "28181",
+                "path": [
+                  "management",
+                  "v3",
+                  "contractnegotiations"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "6. contract negotation",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:28181/management/v3/contractnegotiations/{{contract-negotiation-id}}",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "28181",
+                "path": [
+                  "management",
+                  "v3",
+                  "contractnegotiations",
+                  "{{contract-negotiation-id}}"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "7. transfer",
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"@context\": {\n    \"@vocab\": \"https://w3id.org/edc/v0.0.1/ns/\"\n  },\n  \"@type\": \"TransferRequest\",\n  \"protocol\": \"dataspace-protocol-http\",\n  \"transferType\": \"KafkaBroker-PULL\",\n  \"contractId\": \"{{contract-agreement-id}}\",\n  \"connectorId\": \"provider\",\n  \"counterPartyAddress\": \"http://localhost:18182/protocol\",\n  \"callbackAddresses\": [\n    {\n      \"transactional\": false,\n      \"uri\": \"http://localhost:4000\",\n      \"events\": [\n        \"transfer.process.started\"\n      ]\n    }\n  ]\n}\n",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "http://localhost:28181/management/v3/transferprocesses",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "28181",
+                "path": [
+                  "management",
+                  "v3",
+                  "transferprocesses"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "8. get transfer",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:28181/management/v3/transferprocesses/{{transfer-process-id}}",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "28181",
+                "path": [
+                  "management",
+                  "v3",
+                  "transferprocesses",
+                  "{{transfer-process-id}}"
+                ]
+              }
+            },
+            "response": []
+          }
+        ]
       }
 	],
 	"variable": [
